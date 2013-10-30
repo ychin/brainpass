@@ -20,9 +20,10 @@
     function GeneratePassword() {
         var passphrase = $('#passphrase').val();
         var sitename = $('#sitename').val();
+        var siteusername = $('#siteusername').val();
         var customSalt = $('#customSalt').val();
 
-        var salt = sjcl.hash.sha256.hash('brainpassSalt' + sitename + customSalt);
+        var salt = sjcl.hash.sha256.hash('brainpassSalt' + sitename + siteusername + customSalt);
         var passphraseHash = sjcl.misc.pbkdf2(passphrase, salt, kPbkdf2Iteration, numBits);
         var hashString = sjcl.codec.hex.fromBits(passphraseHash);
 
@@ -75,9 +76,12 @@
     }
 
     $(document).ready( function() {
-        OnInput('#passphrase', OnInputChange);
-        OnInput('#sitename', OnInputChange);
-        OnInput('#customSalt', OnInputChange);
+        
+        var elemsNeedInput = ['#passphrase', '#sitename', '#siteusername', '#customSalt'];
+        for (var i = 0; i < elemsNeedInput.length; ++i) {
+            OnInput(elemsNeedInput[i], OnInputChange);
+        }
+
         $('#hidePassphrase').click(showHidePassphrase);
     });
 })(jQuery);

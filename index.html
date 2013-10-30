@@ -18,17 +18,8 @@
     <header class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <button class="navbar-toggle" data-target=".bs-navbar-collapse" data-toggle="collapse" type="button"><span class="sr-only">Toggle navigation</span> <span class="icon-bar">&nbsp;</span> <span class="icon-bar">&nbsp;</span> <span class="icon-bar">&nbsp;</span></button> <a class="navbar-brand" href="/">Brainpass</a>
+          <button class="navbar-toggle" data-target=".bs-navbar-collapse" data-toggle="collapse" type="button"><span class="sr-only">Toggle navigation</span> <span class="icon-bar">&nbsp;</span> <span class="icon-bar">&nbsp;</span> <span class="icon-bar">&nbsp;</span></button> <span class="navbar-brand" >Brainpass</span>
         </div>
-        <nav class="collapse navbar-collapse bs-navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active">
-              <a data-toggle="tab" href="">Password Generator</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown" id="crCurrency">
-          </ul>
-        </nav>
       </div>
     </header>
     <div class="container">
@@ -41,7 +32,7 @@
                 <label class="col-lg-2 control-label" for="passphrase">Passphrase</label>
                 <div class="col-lg-10 controls">
                   <div class="input-group">
-                    <input class="form-control" id="passphrase" type="password" placeholder="correct horse battery staple" />
+                    <input class="form-control" id="passphrase" type="password" placeholder="correct horse battery staple" autofocus />
                     <div class="input-group-btn">
                       <button class="btn btn-default" id="hidePassphrase" title="Show/Hide Passphrase" type="button">Show</button>
                     </div>
@@ -49,13 +40,13 @@
                 </div>
               </div>
               <div class="form-group">
-                <label class="col-lg-2 control-label" for="passphrase" title="Domain name for the site for the password">Site</label>
+                <label class="col-lg-2 control-label" for="sitename" title="Domain name for the site for the password">Site</label>
                 <div class="col-lg-5 controls">
                   <div class="input-append">
                     <input class="form-control" id="sitename" type="text" placeholder="google.com" />
                   </div>
                 </div>
-                <label class="col-lg-1 control-label" for="passphrase" title="Domain name for the site for the password">Username</label>
+                <label class="col-lg-1 control-label" for="siteusername" title="Domain name for the site for the password">Username</label>
                 <div class="col-lg-4 controls">
                   <div class="input-append">
                     <input class="form-control" id="siteusername" type="text" placeholder="chucknorris1234" />
@@ -63,15 +54,15 @@
                 </div>
               </div>
               <div class="form-group">
-                <label class="col-lg-2 control-label" for="passphrase" title="Custom extra salt if the previous password was compromised. Just a single number would do.">Custom Salt</label>
+                <label class="col-lg-2 control-label" for="customSalt" title="Custom extra salt if the previous password was compromised. Just a single number would do.">Extra Salt</label>
                 <div class="col-lg-10 controls">
                   <div class="input-append">
-                    <input class="form-control" id="customSalt" type="text" placeholder="Leave this empty unless previous password was compromised. Otherwise anything would do here." />
+                    <input class="form-control" id="customSalt" type="text" placeholder="Leave this empty unless a previous password from this site was compromised. Otherwise anything would do here." />
                   </div>
                 </div>
               </div>
               <div class="form-group">
-                <label class="col-lg-2 control-label" for="">Verifier</label>
+                <label class="col-lg-2 control-label" for="verifier">Verifier</label>
                 <div class="col-lg-10 controls">
                   <div class="input-append">
                     <input class="form-control" id="verifier" maxlength="64" readonly="readonly" type="text" />
@@ -87,10 +78,15 @@
                 </div>
               </div>
               <div class="form-group">
-                <label class="col-lg-2 control-label" for="">Generated Password</label>
+                <label class="col-lg-2 control-label" for="generatedPassword">Generated Password</label>
                 <div class="col-lg-10 controls">
                   <div class="input-append">
                     <input class="form-control" id="generatedPassword" maxlength="64" readonly="readonly" type="text" />
+                  </div>
+                  <div id="generateProgressBar" class="progress active progress-striped" style="display:none;">
+                    <div class="progress-bar" role="progressbar" style="width: 100%;">
+                      <span class="sr-only">Generating</span>
+                    </div>
                   </div>
                 </div>
               </div>

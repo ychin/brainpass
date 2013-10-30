@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Brainpass - Client-Side Website Password Geneartor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Website password generator using master passphrase. Allows the use of a single passphrase to generate as many passwords for each website." />
+    <meta name="author" content="ychin" />
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/brainpass.css" rel="stylesheet" />
+    <script src="js/jquery-2.0.3.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bitcoinjs-min.js"></script>
+    <script src="js/brainpass.js"></script>
+    <script src="http://crypto.stanford.edu/sjcl/sjcl.js"></script> <!-- figure out license for this for redistribution since this is BSD rather than the public domain license this is using -->
+  </head>
+  <body>
+    <header class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button class="navbar-toggle" data-target=".bs-navbar-collapse" data-toggle="collapse" type="button"><span class="sr-only">Toggle navigation</span> <span class="icon-bar">&nbsp;</span> <span class="icon-bar">&nbsp;</span> <span class="icon-bar">&nbsp;</span></button> <a class="navbar-brand" href="/">Brainpass</a>
+        </div>
+        <nav class="collapse navbar-collapse bs-navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active">
+              <a data-toggle="tab" href="">Password Generator</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown" id="crCurrency">
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="tab-content">
+        <div class="tab-pane fade in active" id="generator">
+          <form action="/" class="form-horizontal" method="get">
+            <fieldset>
+              <legend>Password Generator</legend>
+              <div class="form-group">
+                <label class="col-lg-2 control-label" for="passphrase">Passphrase</label>
+                <div class="col-lg-10 controls">
+                  <div class="input-group">
+                    <input class="form-control" id="passphrase" type="text" />
+                    <div class="input-group-btn">
+                      <button class="btn btn-default" id="hidePassphrase" title="Show/Hide Passphrase" type="button">Hide</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-lg-2 control-label" for="hash">Hash</label>
+                <div class="col-lg-10 controls">
+                  <div class="input-append">
+                    <input class="form-control" id="hash" maxlength="64" readonly="readonly" type="text" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-lg-2 control-label" for="">Verifier</label>
+                <div class="col-lg-10 controls">
+                  <div class="input-append">
+                    <input class="form-control" id="verifier" maxlength="64" readonly="readonly" type="text" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-lg-2 control-label" for="">Generated Password</label>
+                <div class="col-lg-10 controls">
+                  <div class="input-append">
+                    <input class="form-control" id="generatedPassword" maxlength="64" readonly="readonly" type="text" />
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <hr />
+        <footer>
+          <p>
+            &copy; 2012&ndash;2013 Brainpass<span class="pull-right">Powered by <a href="http://pages.github.com">GitHub Pages</a> &nbsp; <a href="https://github.com/ychin/brainpass">Download Source Code</a></span>
+          </p>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
+

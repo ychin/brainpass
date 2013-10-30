@@ -19,8 +19,10 @@
     var numBits = 256; // this needs to actually be dependent on desired key size, should make at least 256
     function GeneratePassword() {
         var passphrase = $('#passphrase').val();
+        var sitename = $('#sitename').val();
+        var customSalt = $('#customSalt').val();
 
-        var salt = sjcl.hash.sha256.hash('brainpassSalt');
+        var salt = sjcl.hash.sha256.hash('brainpassSalt' + sitename + customSalt);
         var passphraseHash = sjcl.misc.pbkdf2(passphrase, salt, kPbkdf2Iteration, numBits);
         var hashString = sjcl.codec.hex.fromBits(passphraseHash);
 
@@ -74,6 +76,8 @@
 
     $(document).ready( function() {
         OnInput('#passphrase', OnInputChange);
+        OnInput('#sitename', OnInputChange);
+        OnInput('#customSalt', OnInputChange);
         $('#hidePassphrase').click(showHidePassphrase);
     });
 })(jQuery);

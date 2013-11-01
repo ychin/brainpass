@@ -1,6 +1,6 @@
 // JSONP style injection so this will even run offline in file:// since some browsers like Chrome won't allow XHR when in file:// protocol
 // 4337 words, roughly 12 bits. If we have 5 words we get 5*12 = 60 bit entropy
-englishWordList = [
+en_wordlist = [
     "aids",
     "am",
     "african",

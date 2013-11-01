@@ -61,6 +61,27 @@
     }
 
     // Passphrase Generator
+    if (typeof window !== 'undefined' && window.en_wordlist) { // check whether running in web worker or not
+        var gPassphraseGeneratorLocales = {
+            en: {
+                wordlist: en_wordlist,
+                numWords: 5,
+                useSpace: true
+            },
+            zhtw: {
+                wordlist: zhtw_wordlist,
+                numWords: 6,
+                useSpace: false
+            },
+            zhcn: {
+                wordlist: zhcn_wordlist,
+                numWords: 6,
+                useSpace: false
+            }
+        };
+        var gPassphraseGeneratorLocale = gPassphraseGeneratorLocales.en;
+    }
+
     function GeneratePassphrase() {
         // Pick passphrase
         var newPassphrase = GenRandomEnglishPassphrase();
@@ -73,8 +94,27 @@
         OnInputChange();
     }
 
+    function UpdateRandPassphraseLanguage() {
+        var id = $(this).attr('id');
+        switch (id) {
+            case 'randZHTW':
+                gPassphraseGeneratorLocale = gPassphraseGeneratorLocales.zhtw;
+                break;
+            case 'randZHCN':
+                gPassphraseGeneratorLocale = gPassphraseGeneratorLocales.zhcn;
+                break;
+            case 'randEN':
+            default:
+                gPassphraseGeneratorLocale = gPassphraseGeneratorLocales.en;
+                break;
+        }
+    }
+
     function GenRandomEnglishPassphrase() {
-        var numWordsToPick = 5;
+        var numWordsToPick = gPassphraseGeneratorLocale.numWords;
+        var useSpace = gPassphraseGeneratorLocale.useSpace;
+        var wordlist = gPassphraseGeneratorLocale.wordlist;
+
         var newPassphrase = new Array(numWordsToPick);
 
         if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
@@ -83,18 +123,18 @@
             }
             for (var i = 0; i < numWordsToPick; ++i) {
                 var index = Math.floor(Math.random() * numWordsToPick);
-                newPassphrase[i] = englishWordList[index];
+                newPassphrase[i] = wordlist[index];
             }
         }
         else {
             var indices = new Uint32Array(numWordsToPick);
             crypto.getRandomValues(indices);
             for (var i = 0; i < numWordsToPick; ++i) {
-                newPassphrase[i] = englishWordList[indices[i] % englishWordList.length];
+                newPassphrase[i] = wordlist[indices[i] % wordlist.length];
             }
         }
 
-        return newPassphrase.join(' ');
+        return newPassphrase.join(useSpace ? ' ' : '');
     }
 
     // Web Worker async
@@ -239,6 +279,7 @@
             }
 
             $('#generatePassphrase').click(GeneratePassphrase);
+            $('#randPassphraseLang label input').on('change', UpdateRandPassphraseLanguage);
             $('#hidePassphrase').click(ShowHidePassphrase);
             $('#activateSymbols').click(ToggleSymbols);
 

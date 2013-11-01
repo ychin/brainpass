@@ -11,9 +11,12 @@
     <script src="js/jquery-2.0.3.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/bitcoinjs-min.js"></script>
-    <script src="js/brainpass.js"></script>
-    <script src="js/english_words.js"></script>
     <script src="http://crypto.stanford.edu/sjcl/sjcl.js"></script> <!-- figure out license for this for redistribution since this is BSD rather than the public domain license this is using -->
+
+    <script src="js/en_words.js"></script>
+    <script src="js/zh-tw_words.js"></script>
+    <script src="js/zh-cn_words.js"></script>
+    <script src="js/brainpass.js"></script>
   </head>
   <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
@@ -33,11 +36,10 @@
                 <label class="col-lg-2 control-label">Passphrase Generator</label>
                 <div class="col-lg-10 controls">
                   <button class="btn btn-default" id="generatePassphrase" title="Generate a new passphrase" type="button">Generate</button>
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default active" title='Generate a new passphrase using the "Correct Horse Battery Staple method"'>English</button>
-                    <!--
-                    <button type="button" class="btn btn-default">Chinese</button>
-                    -->
+                  <div class="btn-group" data-toggle="buttons" id="randPassphraseLang">
+                    <label class="btn btn-default active" title='Generate a new passphrase using the "Correct Horse Battery Staple method"'><input id="randEN" type="radio" name="randPassphraseLang" />English</label>
+                    <label class="btn btn-default"><input id="randZHTW" type="radio" name="randPassphraseLang" />中文 (Trad)</label>
+                    <label class="btn btn-default"><input id="randZHCN" type="radio" name="randPassphraseLang" />中文 (Simp)</label>
                   </div>
                 </div>
               </div>

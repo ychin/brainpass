@@ -40,11 +40,12 @@
         if (useSymbolsForPassword)
             alphabet += symbols;
         var passwordLength = 16;
+
         var base = BigInteger.valueOf(alphabet.length);
         var password = new Array(passwordLength);
-        var hashString = sjcl.codec.hex.fromBits(hash);
-        var hashBytes = Crypto.util.hexToBytes(hashString);
+        var hashBytes = sjcl.codec.bytes.fromBits(hash);
         var hashBigNum = BigInteger.fromByteArrayUnsigned(hashBytes);
+
         for (var passwordI = 0; passwordI < passwordLength; ++passwordI) {
             var mod = hashBigNum.mod(base);
             password[passwordI] = alphabet[mod.intValue()];
@@ -176,7 +177,7 @@
     onmessage = function(message) { // these are only called when in the worker thread
         if (message.data.type == 'load') {
             window = global;
-            importScripts('bitcoinjs-min.js', 'http://crypto.stanford.edu/sjcl/sjcl.js');
+            importScripts('external/bitcoinjs-min.js', 'external/sjcl.js', 'external/codecBytes.js');
         }
         else if (message.data.type == 'generate') {
             var passwordResults = GeneratePassword(message.data.data);

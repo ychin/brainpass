@@ -1,6 +1,7 @@
 (function(global){
     var kPbkdf2Iteration = 100000;
     var kTimeoutDuration = 600;
+    var kPasswordLength = 16;
 
     var gUseSymbolsForPassword = false; // pass this to web worker
     var gResults = null;
@@ -16,14 +17,16 @@
         var sitename = config.sitename;
         var siteusername = config.siteusername;
         var customSalt = config.customSalt;
+        var hashIterations = config.hashIterations;
+        var passwordLength = config.passwordLength;
 
         var useSymbolsForPassword = config.useSymbolsForPassword;
 
         var salt = sjcl.hash.sha256.hash('brainpassSalt' + sitename + siteusername + customSalt);
-        var passphraseHash = sjcl.misc.pbkdf2(passphrase, salt, kPbkdf2Iteration, numCryptoBits);
+        var passphraseHash = sjcl.misc.pbkdf2(passphrase, salt, hashIterations, numCryptoBits);
         var hashString = sjcl.codec.hex.fromBits(passphraseHash);
 
-        var passwordStr = GenerateSitePassword(passphraseHash, useSymbolsForPassword);
+        var passwordStr = GenerateSitePassword(passwordLength, passphraseHash, useSymbolsForPassword);
         var verifierHex = ShowVerifier(hashString);
 
         return {
@@ -34,12 +37,11 @@
         };
     }
 
-    function GenerateSitePassword(hash, useSymbolsForPassword) {
+    function GenerateSitePassword(passwordLength, hash, useSymbolsForPassword) {
         var alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         var symbols = '!@#%^&*()-=`~[]\\|;:,./<>?'; // omitted '"$ because seems like some sites don't accept them
         if (useSymbolsForPassword)
             alphabet += symbols;
-        var passwordLength = 16;
 
         var base = BigInteger.valueOf(alphabet.length);
         var password = new Array(passwordLength);
@@ -219,7 +221,17 @@
         var activated = !oldActivated;
         gUseSymbolsForPassword = activated;
         if (gResults) {
-            gResults.passwordStr = GenerateSitePassword(gResults.passphraseHash, gUseSymbolsForPassword);
+            gResults.passwordStr = GenerateSitePassword(kPasswordLength, gResults.passphraseHash, gUseSymbolsForPassword);
+            ShowResults(gResults);
+        }
+    }
+
+    function UpdatePasswordLength() {
+        kPasswordLength = parseInt($('#configPasswordLength').val());
+        if (kPasswordLength < 1 || isNaN(kPasswordLength))
+            kPasswordLength = 1;
+        if (gResults) {
+            gResults.passwordStr = GenerateSitePassword(kPasswordLength, gResults.passphraseHash, gUseSymbolsForPassword);
             ShowResults(gResults);
         }
     }
@@ -232,12 +244,16 @@
             var siteusername = $('#siteusername').val();
             var customSalt = $('#customSalt').val();
 
+            var newHashIterations = parseInt($('#configHashIterations').val());
+
             var generateConfig = {
                 passphrase: passphrase,
                 sitename: sitename,
                 siteusername: siteusername,
                 customSalt: customSalt,
-                useSymbolsForPassword: gUseSymbolsForPassword
+                useSymbolsForPassword: gUseSymbolsForPassword,
+                passwordLength: kPasswordLength,
+                hashIterations: isNaN(newHashIterations) ? kPbkdf2Iteration : newHashIterations
             };
 
             if (asyncWorker) {
@@ -274,15 +290,19 @@
 
     if (global.jQuery) { // this is not defined when in web worker
         $(document).ready( function() {
-            var elemsNeedInput = ['#passphrase', '#sitename', '#siteusername', '#customSalt'];
-            for (var i = 0; i < elemsNeedInput.length; ++i) {
-                OnInput(elemsNeedInput[i], OnInputChange);
-            }
-
             $('#generatePassphrase').click(GeneratePassphrase);
             $('#randPassphraseLang label input').on('change', UpdateRandPassphraseLanguage);
             $('#hidePassphrase').click(ShowHidePassphrase);
             $('#activateSymbols').click(ToggleSymbols);
+
+            $('#configPasswordLength').val(kPasswordLength);
+            OnInput('#configPasswordLength', UpdatePasswordLength);
+            $('#configHashIterations').val(kPbkdf2Iteration);
+
+            var elemsNeedInput = ['#passphrase', '#sitename', '#siteusername', '#customSalt', '#configHashIterations'];
+            for (var i = 0; i < elemsNeedInput.length; ++i) {
+                OnInput(elemsNeedInput[i], OnInputChange);
+            }
 
             SetupWebWorker();
         });

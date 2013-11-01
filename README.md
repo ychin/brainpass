@@ -4,10 +4,6 @@ brainpass
 Utility webpage to generate per-site passwords from a master passphrase, without needing external data. Similar to how brainwallet works.
 
 TODOs:
-- CLEANUP
-- Fix web worker to not continually send info to it
-- webworker to do in the background
-- is there a way to incrementally hash?
 - local storage stores websites for me, allow exporting to JSON
 - random passphrase generator
  - different languages

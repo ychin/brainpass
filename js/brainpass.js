@@ -60,6 +60,43 @@
         return verifierHex;
     }
 
+    // Passphrase Generator
+    function GeneratePassphrase() {
+        // Pick passphrase
+        var newPassphrase = GenRandomEnglishPassphrase();
+        $('#passphrase').val(newPassphrase);
+
+        // Update UI and regenerate password
+        if ($('#passphrase').attr('type') == 'password') {
+            ShowHidePassphrase(); // we have to show the passphrase if it's randomly generated so the user can actually see it
+        }
+        OnInputChange();
+    }
+
+    function GenRandomEnglishPassphrase() {
+        var numWordsToPick = 5;
+        var newPassphrase = new Array(numWordsToPick);
+
+        if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
+            for (var i = 0; i < 10; ++i) {
+                Math.random(); // just prime the rand gen in this case, although ideally we really should use window.crypto
+            }
+            for (var i = 0; i < numWordsToPick; ++i) {
+                var index = Math.floor(Math.random() * numWordsToPick);
+                newPassphrase[i] = englishWordList[index];
+            }
+        }
+        else {
+            var indices = new Uint32Array(numWordsToPick);
+            crypto.getRandomValues(indices);
+            for (var i = 0; i < numWordsToPick; ++i) {
+                newPassphrase[i] = englishWordList[indices[i] % englishWordList.length];
+            }
+        }
+
+        return newPassphrase.join(' ');
+    }
+
     // Web Worker async
     var asyncWorker;
     var gWorkerRunning = false;
@@ -201,6 +238,7 @@
                 OnInput(elemsNeedInput[i], OnInputChange);
             }
 
+            $('#generatePassphrase').click(GeneratePassphrase);
             $('#hidePassphrase').click(ShowHidePassphrase);
             $('#activateSymbols').click(ToggleSymbols);
 

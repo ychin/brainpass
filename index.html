@@ -12,6 +12,7 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/bitcoinjs-min.js"></script>
     <script src="js/brainpass.js"></script>
+    <script src="js/english_words.js"></script>
     <script src="http://crypto.stanford.edu/sjcl/sjcl.js"></script> <!-- figure out license for this for redistribution since this is BSD rather than the public domain license this is using -->
   </head>
   <body>
@@ -28,6 +29,18 @@
           <form action="/" class="form-horizontal" method="get">
             <fieldset>
               <legend>Password Generator</legend>
+              <div class="form-group">
+                <label class="col-lg-2 control-label">Passphrase Generator</label>
+                <div class="col-lg-10 controls">
+                  <button class="btn btn-default" id="generatePassphrase" title="Generate a new passphrase" type="button">Generate</button>
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-default active" title='Generate a new passphrase using the "Correct Horse Battery Staple method"'>English</button>
+                    <!--
+                    <button type="button" class="btn btn-default">Chinese</button>
+                    -->
+                  </div>
+                </div>
+              </div>
               <div class="form-group">
                 <label class="col-lg-2 control-label" for="passphrase">Passphrase</label>
                 <div class="col-lg-10 controls">
@@ -100,7 +113,7 @@
         <hr />
         <footer>
           <p>
-            &copy; 2013 Yee Cheng Chin<span class="pull-right">Powered by <a href="http://pages.github.com">GitHub Pages</a> &nbsp; <a href="https://github.com/ychin/brainpass">Download Source Code</a></span>
+            &copy; 2013 Yee Cheng Chin<span class="pull-right">Powered by <a href="http://pages.github.com">GitHub Pages</a> &nbsp; <a href="https://github.com/ychin/brainpass">Source Code</a></span>
           </p>
         </footer>
       </div>

@@ -110,6 +110,7 @@
     // UI
     function ShowProgressBar() {
         $('#generateProgressBar').toggle(true);
+        $('#activateSymbols').attr('disabled', true);
     }
     function HideProgressBar() {
         $('#generateProgressBar').toggle(false);
@@ -119,6 +120,7 @@
         gResults = results;
         $('#hash').val(results.hashString);
         $('#generatedPassword').val(results.passwordStr);
+        $('#activateSymbols').attr('disabled', false);
         $('#verifier').val(results.verifierHex);
     }
 

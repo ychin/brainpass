@@ -1,31 +1,45 @@
 (function(global){
-    var kPbkdf2Iteration = 300000;
-    var kTimeoutDuration = 600;
+    var kPbkdf2Iteration = 100000;
+    var kTimeoutDuration = 500;
+
+    var gUseSymbolsForPassword = false; // pass this to web worker
+    var gResults = null;
 
     var timeout = null;
 
     // Crypto
     var numCryptoBits = 256; // this just needs to be large enough to cover enough bits for the password. Assuming an alphanumeric password with roughly 6 bits per char, this can generate 42 unique password characters
-    function GeneratePassword(passphrase, sitename, siteusername, customSalt) {
+    function GeneratePassword(config) {
         // Generate the PBKDF2 hash first with all information taken into account, then use that hash to generate
         // the per-site password from the hash which is what we want.
+        var passphrase = config.passphrase;
+        var sitename = config.sitename;
+        var siteusername = config.siteusername;
+        var customSalt = config.customSalt;
+
+        var useSymbolsForPassword = config.useSymbolsForPassword;
+
         var salt = sjcl.hash.sha256.hash('brainpassSalt' + sitename + siteusername + customSalt);
         var passphraseHash = sjcl.misc.pbkdf2(passphrase, salt, kPbkdf2Iteration, numCryptoBits);
         var hashString = sjcl.codec.hex.fromBits(passphraseHash);
 
-        var passwordStr = GenerateSitePassword(passphraseHash);
+        var passwordStr = GenerateSitePassword(passphraseHash, useSymbolsForPassword);
         var verifierHex = ShowVerifier(hashString);
 
         return {
             hashString: hashString,
+            passphraseHash: passphraseHash,
             passwordStr: passwordStr,
             verifierHex: verifierHex
         };
     }
 
-    function GenerateSitePassword(hash) {
+    function GenerateSitePassword(hash, useSymbolsForPassword) {
         var alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        var passwordLength = 24;
+        var symbols = '!@#%^&*()-=`~[]\\|;:,./<>?'; // omitted '"$ because seems like some sites don't accept them
+        if (useSymbolsForPassword)
+            alphabet += symbols;
+        var passwordLength = 16;
         var base = BigInteger.valueOf(alphabet.length);
         var password = new Array(passwordLength);
         var hashString = sjcl.codec.hex.fromBits(hash);
@@ -74,7 +88,7 @@
             importScripts('bitcoinjs-min.js', 'http://crypto.stanford.edu/sjcl/sjcl.js');
         }
         else if (message.data.type == 'generate') {
-            var passwordResults = GeneratePassword(message.data.data.passphrase, message.data.data.sitename, message.data.data.siteusername, message.data.data.customSalt);
+            var passwordResults = GeneratePassword(message.data.data);
             postMessage(passwordResults);
         }
     };
@@ -88,6 +102,7 @@
     }
 
     function ShowResults(results) {
+        gResults = results;
         $('#hash').val(results.hashString);
         $('#generatedPassword').val(results.passwordStr);
         $('#verifier').val(results.verifierHex);
@@ -105,6 +120,16 @@
         }
     }
 
+    function ToggleSymbols() {
+        var oldActivated = $('#activateSymbols').hasClass('active');
+        var activated = !oldActivated;
+        gUseSymbolsForPassword = activated;
+        if (gResults) {
+            gResults.passwordStr = GenerateSitePassword(gResults.passphraseHash, gUseSymbolsForPassword);
+            ShowResults(gResults);
+        }
+    }
+
     function OnInputChange() {
         clearTimeout(timeout);
         timeout = setTimeout(function() {
@@ -113,20 +138,23 @@
             var siteusername = $('#siteusername').val();
             var customSalt = $('#customSalt').val();
 
+            var generateConfig = {
+                passphrase: passphrase,
+                sitename: sitename,
+                siteusername: siteusername,
+                customSalt: customSalt,
+                useSymbolsForPassword: gUseSymbolsForPassword
+            };
+
             if (asyncWorker) {
                 ShowProgressBar();
                 asyncWorker.postMessage({
                     type: 'generate',
-                    data: {
-                        passphrase: passphrase,
-                        sitename: sitename,
-                        siteusername: siteusername,
-                        customSalt: customSalt
-                    }
+                    data: generateConfig
                 });
             }
             else {
-                var passwordResults = GeneratePassword(passphrase, sitename, siteusername, customSalt);
+                var passwordResults = GeneratePassword(generateConfig);
                 ShowResults(passwordResults);
             }
         }, kTimeoutDuration);
@@ -152,6 +180,7 @@
             }
 
             $('#hidePassphrase').click(ShowHidePassphrase);
+            $('#activateSymbols').click(ToggleSymbols);
 
             SetupWebWorker();
         });

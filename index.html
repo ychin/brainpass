@@ -53,6 +53,7 @@
                   </div>
                 </div>
               </div>
+
               <div class="form-group">
                 <label class="col-lg-2 control-label" for="customSalt" title="Custom extra salt if the previous password was compromised. Just a single number would do.">Extra Salt</label>
                 <div class="col-lg-10 controls">
@@ -80,8 +81,11 @@
               <div class="form-group">
                 <label class="col-lg-2 control-label" for="generatedPassword">Generated Password</label>
                 <div class="col-lg-10 controls">
-                  <div class="input-append">
+                  <div class="input-group">
                     <input class="form-control" id="generatedPassword" maxlength="64" readonly="readonly" type="text" />
+                    <div class="input-group-btn">
+                      <button class="btn btn-default" id="activateSymbols" data-toggle="button" title="Activate to use symbols as well for the password" type="button">Symbols</button>
+                    </div>
                   </div>
                   <div id="generateProgressBar" class="progress active progress-striped" style="display:none;">
                     <div class="progress-bar" role="progressbar" style="width: 100%;">
@@ -96,7 +100,7 @@
         <hr />
         <footer>
           <p>
-            &copy; 2012&ndash;2013 Brainpass<span class="pull-right">Powered by <a href="http://pages.github.com">GitHub Pages</a> &nbsp; <a href="https://github.com/ychin/brainpass">Download Source Code</a></span>
+            &copy; 2013 Yee Cheng Chin<span class="pull-right">Powered by <a href="http://pages.github.com">GitHub Pages</a> &nbsp; <a href="https://github.com/ychin/brainpass">Download Source Code</a></span>
           </p>
         </footer>
       </div>

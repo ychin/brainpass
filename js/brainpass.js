@@ -1,6 +1,6 @@
 (function(global){
     var kPbkdf2Iteration = 100000;
-    var kTimeoutDuration = 500;
+    var kTimeoutDuration = 600;
 
     var gUseSymbolsForPassword = false; // pass this to web worker
     var gResults = null;
@@ -62,6 +62,8 @@
 
     // Web Worker async
     var asyncWorker;
+    var gWorkerRunning = false;
+    var gQueuedAsyncGeneration = null;
     function SetupWebWorker() {
         if (Worker === undefined) {
             return;
@@ -79,6 +81,18 @@
         asyncWorker.onmessage = function(message) {
             ShowResults(message.data);
             HideProgressBar();
+
+            if (gQueuedAsyncGeneration) {
+                ShowProgressBar();
+                asyncWorker.postMessage({
+                    type: 'generate',
+                    data: gQueuedAsyncGeneration
+                });
+                gQueuedAsyncGeneration = null;
+            }
+            else {
+                gWorkerRunning = false;
+            }
         };
     }
 
@@ -148,10 +162,16 @@
 
             if (asyncWorker) {
                 ShowProgressBar();
-                asyncWorker.postMessage({
-                    type: 'generate',
-                    data: generateConfig
-                });
+                if (gWorkerRunning) {
+                    gQueuedAsyncGeneration = generateConfig;
+                }
+                else {
+                    gWorkerRunning = true;
+                    asyncWorker.postMessage({
+                        type: 'generate',
+                        data: generateConfig
+                    });
+                }
             }
             else {
                 var passwordResults = GeneratePassword(generateConfig);

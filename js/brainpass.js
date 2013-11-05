@@ -2,6 +2,7 @@
     var kPbkdf2Iteration = 100000;
     var kTimeoutDuration = 600;
     var kPasswordLength = 16;
+    var kDefaultPassphraseGenEntropy = 60; // 60 bits should be roughly enough. "correct horse battery staple" only has 44
 
     var gUseSymbolsForPassword = false; // pass this to web worker
     var gResults = null;
@@ -68,17 +69,14 @@
         var gPassphraseGeneratorLocales = {
             en: {
                 wordlist: en_wordlist,
-                numWords: 5,
                 useSpace: true
             },
             zhtw: {
                 wordlist: zhtw_wordlist,
-                numWords: 6,
                 useSpace: false
             },
             zhcn: {
                 wordlist: zhcn_wordlist,
-                numWords: 6,
                 useSpace: false
             }
         };
@@ -87,7 +85,7 @@
 
     function GeneratePassphrase() {
         // Pick passphrase
-        var newPassphrase = GenRandomEnglishPassphrase();
+        var newPassphrase = GenRandomLocalePassphrase();
         $('#passphrase').val(newPassphrase);
 
         // Update UI and regenerate password
@@ -113,11 +111,19 @@
         }
     }
 
-    function GenRandomEnglishPassphrase() {
-        var numWordsToPick = gPassphraseGeneratorLocale.numWords;
+    function GenRandomLocalePassphrase() {
         var useSpace = gPassphraseGeneratorLocale.useSpace;
         var wordlist = gPassphraseGeneratorLocale.wordlist;
 
+        // Decide on entropy
+        var passphraseEntropy = parseInt($('#configPassphraseGenEntropy').val());
+        if (isNaN(passphraseEntropy) || passphraseEntropy < 1) {
+            passphraseEntropy = kDefaultPassphraseGenEntropy;
+        }
+        var entropyBitsPerWord = Math.log(wordlist.length) / Math.LN2;
+        var numWordsToPick = Math.ceil(passphraseEntropy / entropyBitsPerWord);
+
+        // Generate the passphrase
         var newPassphrase = new Array(numWordsToPick);
 
         if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
@@ -125,7 +131,7 @@
                 Math.random(); // just prime the rand gen in this case, although ideally we really should use window.crypto
             }
             for (var i = 0; i < numWordsToPick; ++i) {
-                var index = Math.floor(Math.random() * numWordsToPick);
+                var index = Math.floor(Math.random() * wordlist.length);
                 newPassphrase[i] = wordlist[index];
             }
         }
@@ -145,7 +151,7 @@
     var gWorkerRunning = false;
     var gQueuedAsyncGeneration = null;
     function SetupWebWorker() {
-        if (Worker === undefined) {
+        if (typeof Worker === 'undefined') {
             return;
         }
 
@@ -294,10 +300,12 @@
             $('#randPassphraseLang label input').on('change', UpdateRandPassphraseLanguage);
             $('#hidePassphrase').click(ShowHidePassphrase);
             $('#activateSymbols').click(ToggleSymbols);
+            //$('#generatedPassword').focus(function () { this.select();});
 
             $('#configPasswordLength').val(kPasswordLength);
             OnInput('#configPasswordLength', UpdatePasswordLength);
             $('#configHashIterations').val(kPbkdf2Iteration);
+            $('#configPassphraseGenEntropy').val(kDefaultPassphraseGenEntropy);
 
             var elemsNeedInput = ['#passphrase', '#sitename', '#siteusername', '#customSalt', '#configHashIterations'];
             for (var i = 0; i < elemsNeedInput.length; ++i) {

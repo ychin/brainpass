@@ -28,13 +28,11 @@
         var hashString = sjcl.codec.hex.fromBits(passphraseHash);
 
         var passwordStr = GenerateSitePassword(passwordLength, passphraseHash, useSymbolsForPassword);
-        var verifierHex = ShowVerifier(hashString);
 
         return {
             hashString: hashString,
             passphraseHash: passphraseHash,
-            passwordStr: passwordStr,
-            verifierHex: verifierHex
+            passwordStr: passwordStr
         };
     }
 
@@ -56,12 +54,6 @@
         }
         var passwordStr = password.join('');
         return passwordStr;
-    }
-
-    function ShowVerifier(hashString) {
-        var verifierBytes = sjcl.hash.sha256.hash(hashString);
-        var verifierHex = sjcl.codec.hex.fromBits(verifierBytes);
-        return verifierHex;
     }
 
     // Passphrase Generator
@@ -207,7 +199,6 @@
         $('#hash').val(results.hashString);
         $('#generatedPassword').val(results.passwordStr);
         $('#activateSymbols').attr('disabled', false);
-        $('#verifier').val(results.verifierHex);
     }
 
     function ShowHidePassphrase() {

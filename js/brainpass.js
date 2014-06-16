@@ -292,6 +292,7 @@
             $('#hidePassphrase').click(ShowHidePassphrase);
             $('#activateSymbols').click(ToggleSymbols);
             //$('#generatedPassword').focus(function () { this.select();});
+            $('#generatedPassword').click(function () { this.select();});
 
             $('#configPasswordLength').val(kPasswordLength);
             OnInput('#configPasswordLength', UpdatePasswordLength);

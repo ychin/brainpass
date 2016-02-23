@@ -247,8 +247,8 @@
 
             var generateConfig = {
                 passphrase: passphrase,
-                sitename: sitename,
-                siteusername: siteusername,
+                sitename: sitename.trim(),
+                siteusername: siteusername.trim(),
                 customSalt: customSalt,
                 useSymbolsForPassword: gUseSymbolsForPassword,
                 passwordLength: kPasswordLength,

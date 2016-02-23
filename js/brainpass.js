@@ -198,7 +198,7 @@
 
     function ShowResults(results) {
         gResults = results;
-        $('#hash').val(results.hashString);
+        //$('#hash').val(results.hashString);
         $('#generatedPassword').val(results.passwordStr);
         $('#activateSymbols').attr('disabled', false);
     }
@@ -296,7 +296,12 @@
                 window.location.protocol = 'https:';
             }
 
-            $('#generatePassphrase').click(GeneratePassphrase);
+            if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
+                $('#generatePassphrase').prop('disabled', true); // just don't show anything for now. May need to find a way to disable a tooltip on the disabled button if this is a common issue
+            }
+            else {
+                $('#generatePassphrase').click(GeneratePassphrase);
+            }
             $('#randPassphraseLang label input').on('change', UpdateRandPassphraseLanguage);
             $('#hidePassphrase').click(ShowHidePassphrase);
             $('#activateSymbols').click(ToggleSymbols);

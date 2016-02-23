@@ -4,6 +4,8 @@
     var kPasswordLength = 16;
     var kDefaultPassphraseGenEntropy = 60; // 60 bits should be roughly enough. "correct horse battery staple" only has 44
 
+    var kInWebWorker = (typeof window === 'undefined');
+
     var gUseSymbolsForPassword = false; // pass this to web worker
     var gResults = null;
 
@@ -57,7 +59,7 @@
     }
 
     // Passphrase Generator
-    if (typeof window !== 'undefined' && window.en_wordlist) { // check whether running in web worker or not
+    if (!kInWebWorker) {
         var gPassphraseGeneratorLocales = {
             en: {
                 wordlist: en_wordlist,
@@ -176,7 +178,7 @@
 
     onmessage = function(message) { // these are only called when in the worker thread
         if (message.data.type == 'load') {
-            window = global;
+            window = global; // bitcoin-js relies on "window" object unfortunately
             importScripts('external/bitcoinjs-min.js', 'external/sjcl.js', 'external/codecBytes.js');
         }
         else if (message.data.type == 'generate') {
@@ -285,7 +287,7 @@
         });
     }
 
-    if (global.jQuery) { // this is not defined when in web worker
+    if (!kInWebWorker) {
         $(document).ready( function() {
             // Redirect to HTTPS if we're in insecure channels. This helps prevent MITM attack that may inject source code that listens on the password
             // This obviously won't help if the HTTP version has indeed been MITM attacked, but it would set the expectation that this should run

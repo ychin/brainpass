@@ -13,3 +13,6 @@ TODOs:
 - Provide a default list of sites
 - Expose password length
 - Expose hash iteration count / algorithm
+- Mobile improvements:
+ - Auto-select the generated password to make copying easier
+- Turn into app/browser extension to save typing and can auto-copy for us

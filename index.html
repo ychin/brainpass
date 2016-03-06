@@ -37,18 +37,13 @@
                 <label class="col-lg-2 control-label">Passphrase Generator</label>
                 <div class="col-lg-10 controls">
                   <button class="btn btn-default" id="generatePassphrase" title="Generate a new passphrase" type="button">Generate</button>
-                  <div class="btn-group" data-toggle="buttons" id="randPassphraseLang">
-                    <label class="btn btn-default active" title='Generate a new passphrase using the "Correct Horse Battery Staple method"'><input id="randEN" type="radio" name="randPassphraseLang" />English</label>
-                    <label class="btn btn-default"><input id="randZHTW" type="radio" name="randPassphraseLang" />中文 (Trad)</label>
-                    <label class="btn btn-default"><input id="randZHCN" type="radio" name="randPassphraseLang" />中文 (Simp)</label>
-                  </div>
                 </div>
               </div>
               <div class="form-group">
                 <label class="col-lg-2 control-label" for="passphrase">Passphrase</label>
                 <div class="col-lg-10 controls">
                   <div class="input-group">
-                    <input class="form-control" id="passphrase" type="password" placeholder="correct horse battery staple" autofocus />
+                    <input class="form-control" id="passphrase" type="password" placeholder="e.g. correct horse battery staple. Use passphrase generator above to generate a secure passphrase." autofocus />
                     <div class="input-group-btn">
                       <button class="btn btn-default" id="hidePassphrase" title="Show/Hide Passphrase" type="button">Show</button>
                     </div>
@@ -59,13 +54,13 @@
                 <label class="col-lg-2 control-label" for="sitename" title="Domain name for the site for the password">Site</label>
                 <div class="col-lg-5 controls">
                   <div class="input-append">
-                    <input class="form-control" id="sitename" type="text" placeholder="google.com" />
+                    <input class="form-control" id="sitename" type="text" placeholder="e.g. google.com" />
                   </div>
                 </div>
                 <label class="col-lg-1 control-label" for="siteusername" title="Domain name for the site for the password">Username</label>
                 <div class="col-lg-4 controls">
                   <div class="input-append">
-                    <input class="form-control" id="siteusername" type="text" placeholder="chucknorris1234" />
+                    <input class="form-control" id="siteusername" type="text" placeholder="username" />
                   </div>
                 </div>
               </div>
@@ -114,6 +109,14 @@
                     <input class="form-control" id="configHashIterations" type="number" min=1 />
                     <label>Passphrase Generation entropy (bits)</label>
                     <input class="form-control" id="configPassphraseGenEntropy" type="number" min=1 />
+                    <label>Passphrase Generation language</label>
+                    <div class="col-lg-10 controls">
+                      <div class="btn-group" data-toggle="buttons" id="randPassphraseLang">
+                        <label class="btn btn-default active" title='Generate a new passphrase using the "Correct Horse Battery Staple method"'><input id="randEN" type="radio" name="randPassphraseLang" />English</label>
+                        <label class="btn btn-default"><input id="randZHTW" type="radio" name="randPassphraseLang" />中文 (Trad)</label>
+                        <label class="btn btn-default"><input id="randZHCN" type="radio" name="randPassphraseLang" />中文 (Simp)</label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

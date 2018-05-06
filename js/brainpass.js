@@ -12,7 +12,6 @@
     var timeout = null;
 
     // Crypto
-    var numCryptoBits = 256; // this just needs to be large enough to cover enough bits for the password. Assuming an alphanumeric password with roughly 6 bits per char, this can generate 42 unique password characters
     function GeneratePassword(config) {
         // Generate the PBKDF2 hash first with all information taken into account, then use that hash to generate
         // the per-site password from the hash which is what we want.
@@ -21,21 +20,63 @@
         var siteusername = config.siteusername;
         var customSalt = config.customSalt;
         var hashIterations = config.hashIterations;
-        var passwordLength = config.passwordLength;
 
-        var useSymbolsForPassword = config.useSymbolsForPassword;
+        // Note: This needs to be 256 for now to synchronize with the native web crypto solution.
+        var numCryptoBits = 256; // this just needs to be large enough to cover enough bits for the password. Assuming an alphanumeric password with roughly 6 bits per char, this can generate 42 unique password characters
 
         var salt = sjcl.hash.sha256.hash('brainpassSalt' + sitename + siteusername + customSalt);
         var passphraseHash = sjcl.misc.pbkdf2(passphrase, salt, hashIterations, numCryptoBits);
-        var hashString = sjcl.codec.hex.fromBits(passphraseHash);
-
-        var passwordStr = GenerateSitePassword(passwordLength, passphraseHash, useSymbolsForPassword);
+        //var hashString = sjcl.codec.hex.fromBits(passphraseHash);
+        //var passwordStr = GenerateSitePassword(passwordLength, passphraseHash, useSymbolsForPassword);
 
         return {
-            hashString: hashString,
-            passphraseHash: passphraseHash,
-            passwordStr: passwordStr
+            passphraseHash: passphraseHash
         };
+    }
+    function GeneratePasswordNative(config) {
+        // Generate the PBKDF2 hash first with all information taken into account, then use that hash to generate
+        // the per-site password from the hash which is what we want.
+        //
+        // Note: This version uses native web crypto which is much faster.
+        var passphrase = config.passphrase;
+        var sitename = config.sitename;
+        var siteusername = config.siteusername;
+        var customSalt = config.customSalt;
+        var hashIterations = config.hashIterations;
+
+        var textEncoder = new TextEncoder();
+        var saltedString = 'brainpassSalt' + sitename + siteusername + customSalt;
+        return crypto.subtle.digest('SHA-256', textEncoder.encode(saltedString)).then(function(saltBuffer) {
+            // Web crypto PBKDF2 requires multiple steps, each resulting in an async promise.
+            return window.crypto.subtle.importKey(
+                'raw', 
+                textEncoder.encode(passphrase),
+                {'name': 'PBKDF2'}, 
+                false, 
+                ['deriveBits', 'deriveKey']
+            ).then(function(key) {
+                return window.crypto.subtle.deriveKey(
+                    {
+                        "name": 'PBKDF2',
+                        "salt": saltBuffer,
+                        "iterations": hashIterations,
+                        "hash": 'SHA-256'
+                    },
+                    key,
+                    // This actually isn't really used, but mostly to satisfy the API
+                    { "name": 'AES-CBC', "length": 256 },
+                    true,
+                    [ "encrypt", "decrypt" ]
+                )
+            }).then(function (webKey) {
+                return crypto.subtle.exportKey("raw", webKey);
+            }).then(function (buffer) {
+                var passwordResults = {
+                    passphraseHash: buffer
+                };
+                return passwordResults;
+            });
+        });
     }
 
     function GenerateSitePassword(passwordLength, hash, useSymbolsForPassword) {
@@ -46,7 +87,14 @@
 
         var base = BigInteger.valueOf(alphabet.length);
         var password = new Array(passwordLength);
-        var hashBytes = sjcl.codec.bytes.fromBits(hash);
+        var hashBytes = null;
+
+        if (hash instanceof ArrayBuffer) { // native web crypto
+            hashBytes = Array.from(new Uint8Array(hash));
+        }
+        else {
+            hashBytes = sjcl.codec.bytes.fromBits(hash);
+        }
         var hashBigNum = BigInteger.fromByteArrayUnsigned(hashBytes);
 
         for (var passwordI = 0; passwordI < passwordLength; ++passwordI) {
@@ -182,8 +230,16 @@
             importScripts('external/bitcoinjs-min.js', 'external/sjcl.js', 'external/codecBytes.js');
         }
         else if (message.data.type == 'generate') {
-            var passwordResults = GeneratePassword(message.data.data);
-            postMessage(passwordResults);
+            var hasNativeSubtleCrypto = (typeof crypto != 'undefined' && crypto.subtle);
+            if (!hasNativeSubtleCrypto) {
+                var passwordResults = GeneratePassword(message.data.data);
+                postMessage(passwordResults);
+            }
+            else {
+                GeneratePasswordNative(message.data.data).then(function(results) {
+                    postMessage(results);
+                });
+            }
         }
     };
 
@@ -199,7 +255,10 @@
     function ShowResults(results) {
         gResults = results;
         //$('#hash').val(results.hashString);
-        $('#generatedPassword').val(results.passwordStr);
+
+        var passwordStr = GenerateSitePassword(kPasswordLength, gResults.passphraseHash, gUseSymbolsForPassword);
+
+        $('#generatedPassword').val(passwordStr);
         $('#activateSymbols').attr('disabled', false);
     }
 
@@ -243,6 +302,11 @@
             var siteusername = $('#siteusername').val();
             var customSalt = $('#customSalt').val();
 
+            if (passphrase == '') {
+                // Native web crypto seems to have an issue with empty passphrase in WebKit so just don't do anything for now.
+                return;
+            }
+
             var newHashIterations = parseInt($('#configHashIterations').val());
 
             var generateConfig = {
@@ -250,8 +314,6 @@
                 sitename: sitename.trim(),
                 siteusername: siteusername.trim(),
                 customSalt: customSalt,
-                useSymbolsForPassword: gUseSymbolsForPassword,
-                passwordLength: kPasswordLength,
                 hashIterations: isNaN(newHashIterations) ? kPbkdf2Iteration : newHashIterations
             };
 

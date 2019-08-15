@@ -169,13 +169,7 @@
         var newPassphrase = new Array(numWordsToPick);
 
         if (typeof crypto === 'undefined' || !crypto.getRandomValues) {
-            for (var i = 0; i < 10; ++i) {
-                Math.random(); // just prime the rand gen in this case, although ideally we really should use window.crypto
-            }
-            for (var i = 0; i < numWordsToPick; ++i) {
-                var index = Math.floor(Math.random() * wordlist.length);
-                newPassphrase[i] = wordlist[index];
-            }
+            // Don't do anything. The button shouldn't be enabled to allow this code path anyway.
         }
         else {
             var indices = new Uint32Array(numWordsToPick);

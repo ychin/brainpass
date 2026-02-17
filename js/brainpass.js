@@ -348,7 +348,7 @@
             // Redirect to HTTPS if we're in insecure channels. This helps prevent MITM attack that may inject source code that listens on the password
             // This obviously won't help if the HTTP version has indeed been MITM attacked, but it would set the expectation that this should run
             // under HTTPS so bookmarks etc would be directed at the secure version instead.
-            if (window.location.protocol == 'http:') {
+            if (window.location.hostname != 'localhost' && window.location.protocol == 'http:') {
                 window.location.protocol = 'https:';
             }
 

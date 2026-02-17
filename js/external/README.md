@@ -5,7 +5,7 @@ This folder hosts the external JS libraries. Most of them are minified but they 
 # Stanford Javascript Crypto Library #
 
 #### sjcl.js ####
-http://bitwiseshiftleft.github.com/sjcl/  
+http://bitwiseshiftleft.github.io/sjcl/  
 Commit ff46726
 
 #### codecBytes.js ###

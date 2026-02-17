@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Website password generator using master passphrase. Allows the use of a single passphrase to generate as many passwords for each website." />
     <meta name="author" content="ychin" />
+    <!-- Protection against script injection attacks which can be used to leak user information -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self';
+                   script-src 'self' 'unsafe-inline' 'unsafe-eval';
+                   style-src 'self' 'unsafe-inline';
+                   img-src 'none';
+                   connect-src 'none';
+                   form-action 'none';">
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/brainpass.css" rel="stylesheet" />
     <script src="js/external/jquery-2.0.3.min.js"></script>
